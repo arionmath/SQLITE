@@ -17,9 +17,12 @@ else:
 
 
 def executarQuery(sql):
+    
+    print("Executando query: "+sql)
     cursor = conexao.cursor()
     cursor.execute(sql)
-    return cursor.fetchall()
+
+    print( cursor.fetchall())
 
 
 def executarComando(sqlcomando='none'):
@@ -94,21 +97,58 @@ def fazerComandoAtualizacaoRegistros():
         "Digite o valor a ser posto(não esquecer das aspas se for texto) ")
     regra = input(
         "Digite o filtro para a atualizacao de itens (EX: id > 9 AND id <20)    ")
-    
-    comandoSQL = "UPDATE " + nometabela + " SET " + coluna+" = " + valor + " WHERE "+regra
+
+    comandoSQL = "UPDATE " + nometabela + " SET " + \
+        coluna+" = " + valor + " WHERE "+regra
     print(comandoSQL)
     return comandoSQL
+
+
+def fazerComandoConsulta():
+    mostrarTabelas()
+    tabela = input("Digite a tabela que deseja consultar ")
+    resposta1 = input("Deseja especificar as colunas?[s|n] ")
+
+    if resposta1.lower() == 'n':
+        resposta2 = input("Deseja filtrar o resultado? [s|n] ")
+
+        if resposta2.lower() == "n":
+            sqlc = "SELECT * FROM "+tabela
+            print(sqlc)
+            return sqlc
+
+        elif resposta2.lower() == "s":
+            clausula = input("Digite o como filtrar o resultado (Ex: id>10) ")
+            return "SELECT * FROM "+tabela+" WHERE "+clausula
+
+    elif resposta1.lower() == 's':
+        colunas = input("Digite as colunas de interesse separadas por vírgula ")
+        resposta2 = input("Deseja filtrar o resultado? [s|n] ")
+
+        if resposta2.lower() == "n":
+            return "SELECT "+colunas+" FROM "+tabela
+
+        elif resposta2.lower() == "s":
+            clausula = input("Digite o como filtrar o resultado (Ex: id>10) ")
+            return "SELECT "+colunas+" FROM "+tabela+" WHERE "+clausula
+
+
+def mostrarTabelas():
+    executarQuery("select sql from sqlite_master")
 
 
 while(True):
     print(
         """
     -----------MENU------------
-    -1 para criar novas tabelas
-    -2 para excluir tabelas
-    -3 para adicionar dados
-    -4 para excluir dados
-    -5 para atualizar dados
+    -1 Para criar novas tabelas
+    -2 Para excluir tabelas
+    -3 Para adicionar dados
+    -4 Para excluir dados
+    -5 Para atualizar dados
+    -6 Para consultar dados
+    -7 Para ver a estrutura do banco
+    -8 Sair
     ---------------------------""")
     operacao = int(input())
 
@@ -123,6 +163,10 @@ while(True):
     elif operacao == 5:
         executarComando(fazerComandoAtualizacaoRegistros())
     elif operacao == 6:
+        executarQuery( fazerComandoConsulta() )
+    elif operacao == 7:
+        mostrarTabelas()
+    elif operacao == 8:
         raise Exception("Saindo")
     else:
-        print('operaccao inválida')
+        print('operacao inválida')
